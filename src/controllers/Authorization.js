@@ -166,3 +166,39 @@ exports.uploadProfileImage = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
+
+exports.addPost = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { text } = req.body;
+    const files = req.files;
+
+    if (!text || (!files.images && !files.videos)) {
+      return res.status(400).json({ message: "Text and at least one image or video are required" });
+    }
+
+    const imageUrls = files.images ? files.images.map(file => file.location) : [];
+    const videoUrls = files.videos ? files.videos.map(file => file.location) : [];
+
+    const post = {
+      text,
+      images: imageUrls,
+      videos: videoUrls
+    };
+
+    const user = await User.findByIdAndUpdate(userId, { $push: { Posts: post } }, { new: true });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      message: 'Post added successfully',
+      user,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
