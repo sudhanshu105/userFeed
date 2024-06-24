@@ -202,3 +202,24 @@ exports.addPost = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
+
+exports.getUserPosts = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId).select("Posts");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const sortedPosts = user.Posts.sort((a, b) => b._id.getTimestamp() - a._id.getTimestamp());
+
+    res.json({
+      status: true,
+      posts: sortedPosts,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
