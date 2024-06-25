@@ -223,3 +223,56 @@ exports.getUserPosts = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+exports.getAllPosts = async (req, res) => {
+  try {
+    const users = await User.find().select('Posts -_id').lean();
+
+    const allPosts = users.flatMap(user => user.Posts);
+    // .sort((a, b) => b.createdAt - a.createdAt);
+
+    res.json({
+      status: true,
+      posts: allPosts,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+
+exports.addMyVehicle = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { Name } = req.body;
+
+    if (!Name || !req.files || req.files.length === 0) {
+      return res.status(400).json({ message: 'Vehicle name and at least one image are required' });
+    }
+
+    const imageUrls = req.files.map(file => file.location);
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const newVehicle = {
+      Name,
+      Images: imageUrls
+    };
+
+    user.MyVehicles.push(newVehicle);
+    await user.save();
+
+    res.json({
+      message: 'Vehicle added successfully',
+      vehicle: newVehicle
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};

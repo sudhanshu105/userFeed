@@ -68,7 +68,7 @@ const user = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Post'
   }]
-});
+}, { timestamps: true });
 
 const User = new mongoose.model("User", user);
 module.exports = User;
