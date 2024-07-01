@@ -21,6 +21,12 @@ const user = new mongoose.Schema({
     type: String,
     required: true
   },
+  fullName: {
+    type: String
+  },
+  dob:{
+    type: String
+  }
   MyVehicles: [{
     Name: {
       type: String,
