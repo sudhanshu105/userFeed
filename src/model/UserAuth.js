@@ -26,7 +26,7 @@ const user = new mongoose.Schema({
   },
   dob:{
     type: String
-  }
+  },
   MyVehicles: [{
     Name: {
       type: String,
